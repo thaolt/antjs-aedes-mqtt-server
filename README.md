@@ -48,7 +48,7 @@ Ant implements a large but *incomplete* subset of Node's APIs. Everything below 
 | `setImmediate(fn, a, b)` drops extra arguments | Wrapped to forward arguments via a closure |
 | `stream.finished()` returns a non-function instead of a cleanup callback | Wrapped to guarantee a function return |
 | `Readable.from()` corrupts async iterables, streams, and object items into Buffer chunks | Reimplemented: pull from the source and `push()` into an object-mode stream |
-| Sockets only emit `'data'` - no `'readable'`/`read()` pull mode that aedes requires | Each socket is wrapped in a `readable-stream` `Duplex` (`server.js`) |
+| Sockets only emit `'data'` - no `'readable'`/`read()` pull mode that aedes requires | `wrapSocket()` export wraps each socket in a `readable-stream` `Duplex`; a passthrough on other runtimes |
 | `http` server ignores `Upgrade` headers - no `'upgrade'` event, so `ws`/`websocket-stream` can never handshake | `ws-stream.js` implements the RFC 6455 handshake (`Sec-WebSocket-Accept` via `crypto` SHA-1) and the frame codec directly on a raw TCP socket |
 
 ## Why aedes is patched (`patches/`)

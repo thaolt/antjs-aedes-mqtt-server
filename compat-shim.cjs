@@ -2,7 +2,8 @@
 // No-ops under Node and Bun, which don't need them.
 var isAnt = typeof process !== 'undefined' &&
   process.versions && process.versions.ant;
-if (!isAnt) return;
+
+if (isAnt) {
 
 // Buffer: ant's Buffer rejects `new Buffer(n)` and lacks most read*/write*
 // accessors. Restore constructor semantics and graft the missing methods
@@ -78,3 +79,34 @@ try {
     return out;
   };
 } catch (e) {}
+
+}
+
+// ant sockets only emit 'data'; aedes needs the pull-style 'readable'/read()
+// interface, so wrap the socket in a readable-stream Duplex. Other runtimes
+// already provide proper Duplex sockets — passthrough there.
+module.exports.wrapSocket = isAnt
+  ? function wrapSocket(socket) {
+      var Duplex = require('readable-stream').Duplex;
+      var d = new Duplex({
+        write: function (chunk, enc, cb) {
+          socket.write(chunk);
+          cb();
+        },
+        final: function (cb) {
+          socket.end();
+          cb();
+        },
+        destroy: function (err, cb) {
+          socket.destroy();
+          cb(err);
+        },
+        read: function () {}
+      });
+      socket.on('data', function (c) { d.push(c); });
+      socket.on('end', function () { d.push(null); });
+      socket.on('error', function (e) { d.destroy(e); });
+      socket.on('close', function () { d.push(null); });
+      return d;
+    }
+  : function wrapSocket(socket) { return socket; };

@@ -1,6 +1,5 @@
-import './compat-shim.cjs';
+import { wrapSocket } from './compat-shim.cjs';
 import net from 'net';
-import { Duplex } from 'readable-stream';
 import { Aedes } from 'aedes';
 import { wsStream } from './ws-stream.js';
 
@@ -60,29 +59,6 @@ aedes.authorizeSubscribe = function (client, sub, callback) {
   }
   callback(null, sub);
 };
-
-function wrapSocket(socket) {
-  const d = new Duplex({
-    write(chunk, enc, cb) {
-      socket.write(chunk);
-      cb();
-    },
-    final(cb) {
-      socket.end();
-      cb();
-    },
-    destroy(err, cb) {
-      socket.destroy();
-      cb(err);
-    },
-    read() {}
-  });
-  socket.on('data', c => d.push(c));
-  socket.on('end', () => d.push(null));
-  socket.on('error', e => d.destroy(e));
-  socket.on('close', () => d.push(null));
-  return d;
-}
 
 aedes.listen().then(function(){
   const server = net.createServer(function(conn){
