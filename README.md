@@ -1,4 +1,4 @@
-# mqtt-try
+# antjs-aedes-mqtt-server
 
 An MQTT broker running on the [Ant](https://github.com/theMackabu/ant) JavaScript runtime, powered by [aedes](https://github.com/moscajs/aedes) (MQTT 3.1/3.1.1/5.0).
 
