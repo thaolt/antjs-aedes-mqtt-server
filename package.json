@@ -4,7 +4,9 @@
   "type": "module",
   "main": "index.js",
   "scripts": {
-    "start": "ant server.js"
+    "start": "ant server.js",
+    "postinstall": "sh scripts/apply-patches.sh",
+    "patch-deps": "sh scripts/apply-patches.sh"
   },
   "dependencies": {
     "buffer": "^6.0.3",
