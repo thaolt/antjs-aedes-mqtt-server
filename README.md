@@ -48,7 +48,7 @@ COPY server /
 
 Build the binary, `docker build -t mqtt-server .`, and you have a minimal MQTT broker image.
 
-## Why the compat shim (`compat-shim.cjs`)
+## Why the compat shim (`compat-shim.js`)
 
 Ant implements a large but *incomplete* subset of Node's APIs. Everything below is patched at startup - only when `process.versions.ant` is present, so Node and Bun run unmodified:
 
@@ -59,7 +59,7 @@ Ant implements a large but *incomplete* subset of Node's APIs. Everything below 
 | `stream.finished()` returns a non-function instead of a cleanup callback | Wrapped to guarantee a function return |
 | `Readable.from()` corrupts async iterables, streams, and object items into Buffer chunks | Reimplemented: pull from the source and `push()` into an object-mode stream |
 | Sockets only emit `'data'` - no `'readable'`/`read()` pull mode that aedes requires | `wrapSocket()` export wraps each socket in a `readable-stream` `Duplex`; a passthrough on other runtimes |
-| `http` server ignores `Upgrade` headers - no `'upgrade'` event, so `ws`/`websocket-stream` can never handshake | `ws-stream.js` implements the RFC 6455 handshake (`Sec-WebSocket-Accept` via `crypto` SHA-1) and the frame codec directly on a raw TCP socket |
+| `http` server ignores `Upgrade` headers - no `'upgrade'` event, so `ws` can never handshake | `createWsServer()` performs the RFC 6455 handshake (`Sec-WebSocket-Accept` via `crypto` SHA-1) and frame codec directly on a raw TCP socket; under Node/Bun it uses the standard `http` + `ws` + `createWebSocketStream` stack instead |
 
 ## Why aedes is patched (`patches/`)
 
@@ -81,8 +81,7 @@ Without it, **every** client disconnect throws `TypeError: object is not a funct
 ```
 server.js            entry point: aedes + TCP/WS listeners
 server-auth.js       auth demo: authenticate/authorizePublish/authorizeSubscribe (ports 2883/2884)
-ws-stream.js         WebSocket handshake + frame codec on raw TCP
-compat-shim.cjs      Ant runtime compatibility layer (no-ops on Node/Bun)
+compat-shim.js       Ant runtime shims + wrapSocket + WebSocket transport (no-ops on Node/Bun)
 patches/             unified diffs applied to node_modules
 scripts/apply-patches.sh
 Dockerfile           FROM scratch + the compiled binary

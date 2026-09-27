@@ -1,7 +1,6 @@
-import { wrapSocket } from './compat-shim.cjs';
+import { wrapSocket, createWsServer } from './compat-shim.js';
 import net from 'net';
 import { Aedes } from 'aedes';
-import { wsStream } from './ws-stream.js';
 
 // Demo user database. In a real deployment, check credentials against a
 // database/hash instead of comparing plaintext.
@@ -68,8 +67,8 @@ aedes.listen().then(function(){
     console.log('mqtt (auth) listening on port 2883');
   });
 
-  const wsServer = net.createServer(function(conn){
-    aedes.handle(wsStream(conn));
+  const wsServer = createWsServer(function(conn){
+    aedes.handle(conn);
   });
   wsServer.listen(2884, function(){
     console.log('mqtt over websocket (auth) listening on port 2884');

@@ -1,7 +1,6 @@
-import { wrapSocket } from './compat-shim.cjs';
+import { wrapSocket, createWsServer } from './compat-shim.js';
 import net from 'net';
 import { Aedes } from 'aedes';
-import { wsStream } from './ws-stream.js';
 
 const aedes = new Aedes();
 
@@ -16,10 +15,9 @@ aedes.listen().then(function(){
     console.log('mqtt listening on port 1883');
   });
 
-  // Ant's http server ignores Upgrade requests, so MQTT-over-WebSocket is
-  // served by ws-stream.js performing the WS handshake on a raw TCP socket.
-  const wsServer = net.createServer(function(conn){
-    aedes.handle(wsStream(conn));
+  // Raw-socket RFC 6455 under ant; http + ws under Node/Bun.
+  const wsServer = createWsServer(function(conn){
+    aedes.handle(conn);
   });
 
   wsServer.listen(1884, function(){
