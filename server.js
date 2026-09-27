@@ -31,7 +31,7 @@ function wrapSocket(socket) {
   return d;
 }
 
-// aedes 1.x requires listen() to be called before handle() works —
+// aedes 1.x requires listen() to be called before handle() works
 // it sets broker.closed = false and initializes persistence.
 aedes.listen().then(function(){
   const server = net.createServer(function(conn){
