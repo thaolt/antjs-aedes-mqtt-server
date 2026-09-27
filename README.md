@@ -22,6 +22,16 @@ ant server.js                    # or: node server.js / npm start
 
 ## Build a static binary / image
 
+### Docker builder (recommended)
+
+```sh
+ant run build:docker     # or: npm run build:docker
+```
+
+This builds `Dockerfile.builder` (Alpine 3.24 + Ant installer, which auto-selects the **linux-musl** build), mounts the source tree at `/src`, and runs `ant compile` inside the container. The result is a guaranteed-static `./server` (~11 MB) regardless of which Ant runtime is installed on the host - and the container `chown`s the output to your host UID, so no root-owned files are left behind.
+
+### Local compile
+
 ```sh
 ant compile server.js   # produces ./server, ~10 MB
 ./server
@@ -70,11 +80,13 @@ Without it, **every** client disconnect throws `TypeError: object is not a funct
 
 ```
 server.js            entry point: aedes + TCP/WS listeners
+server-auth.js       auth demo: authenticate/authorizePublish/authorizeSubscribe (ports 2883/2884)
 ws-stream.js         WebSocket handshake + frame codec on raw TCP
 compat-shim.cjs      Ant runtime compatibility layer (no-ops on Node/Bun)
 patches/             unified diffs applied to node_modules
 scripts/apply-patches.sh
 Dockerfile           FROM scratch + the compiled binary
+Dockerfile.builder   Alpine-based Ant toolchain used by `build:docker`
 ```
 
 ## License

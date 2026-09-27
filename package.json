@@ -7,7 +7,8 @@
   "scripts": {
     "start": "ant server.js",
     "postinstall": "sh scripts/apply-patches.sh",
-    "patch-deps": "sh scripts/apply-patches.sh"
+    "patch-deps": "sh scripts/apply-patches.sh",
+    "build:docker": "docker build -f Dockerfile.builder -t antjs-mqtt-builder . && docker run --rm -v \"$PWD:/src\" --entrypoint sh antjs-mqtt-builder -c \"ant compile server.js -o server && chown $(id -u):$(id -g) server\""
   },
   "dependencies": {
     "buffer": "^6.0.3",
