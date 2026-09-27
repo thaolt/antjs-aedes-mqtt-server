@@ -1,5 +1,9 @@
 // Compatibility shims for the Ant runtime's incomplete Node.js APIs.
-//
+// No-ops under Node and Bun, which don't need them.
+var isAnt = typeof process !== 'undefined' &&
+  process.versions && process.versions.ant;
+if (!isAnt) return;
+
 // Buffer: ant's Buffer rejects `new Buffer(n)` and lacks most read*/write*
 // accessors. Restore constructor semantics and graft the missing methods
 // from feross/buffer (npm `buffer`), whose methods operate on plain indexed
