@@ -76,3 +76,7 @@ patches/             unified diffs applied to node_modules
 scripts/apply-patches.sh
 Dockerfile           FROM scratch + the compiled binary
 ```
+
+## License
+
+[MIT](LICENSE) © 2026 thaolt
