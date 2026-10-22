@@ -7,6 +7,7 @@
   "scripts": {
     "start": "ant server.js",
     "postinstall": "sh scripts/apply-patches.sh",
+    "bundle": "esbuild --bundle server.js --outdir=dist --minify --platform=node --format=esm --banner:js=\"import{createRequire}from'module';const require=createRequire(import.meta.url);\"",
     "patch-deps": "sh scripts/apply-patches.sh",
     "build:docker": "docker build -f Dockerfile.builder -t antjs-mqtt-builder . && docker run --rm -v \"$PWD:/src\" --entrypoint sh antjs-mqtt-builder -c \"ant compile server.js -o server && chown $(id -u):$(id -g) server\""
   },
@@ -17,6 +18,7 @@
     "ws": "^8.22.0"
   },
   "devDependencies": {
-    "patch-package": "^8.0.1"
+    "patch-package": "^8.0.1",
+    "esbuild": "^0.28.2"
   }
 }
